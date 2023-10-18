@@ -13,7 +13,6 @@ import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -41,43 +40,67 @@ function Copyright(props) {
 }
 
 export default function SignIn(props) {
-
     const [useremailError, SetUseremailError] = useState(false);
+    const [useremailInvalid, SetUseremailInvalid] = useState(false);
     const [passwordError, SetPasswordError] = useState(false);
-    const [showError, SetShowError] = useState(false);
-    const [loggedIn, SetLoggedIn] = useState(false);
+    const [signedIn, SetSignedIn] = useState(false);
+
+    // Check Empty
+    const [useremailEmpty, SetUseremailEmpty] = useState(false);
+    const [userpasswordEmpty, SetUserPasswordEmpty] = useState(false);
+
+    // Others
+    const [showpassword, SetShowPassword] = useState(false);
 
     useEffect(() => {
-        if (loggedIn) {
+        if (signedIn) {
             navigate(-1);
             navigate('/signIn');
         }
     })
-
-    useEffect(() => {
-        if (showError) {
-            SetUseremailError(!loggedIn)
-            SetPasswordError(!loggedIn)
-        }
-    })
+    
     const navigate = useNavigate();
 
     const SignInAction = async (event) => {
+
+        const validateEmail = (email) => {
+            return String(email)
+                .toLowerCase()
+                .match(
+                    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+                );
+        };
+
         event.preventDefault();
+
         try {
             const data = new FormData(event.currentTarget);
-            const result = await LoginHandler(data);
-            //const boolean = await OidcCallback(result)
-            //SetLoggedIn(boolean)
-            SetShowError(!loggedIn)
+
+            if (data.get('useremail') && data.get('password')) {
+                if (!validateEmail(data.get('useremail'))) {
+                    SetUseremailInvalid(true)
+                }
+                else {
+                    const result = await LoginHandler(data);
+                    SetSignedIn(result)
+                    SetUseremailError(!result)
+                    SetUseremailInvalid(false)
+                }
+            }
+            SetUseremailEmpty(data.get('useremail') === '')
+            SetUserPasswordEmpty(data.get('password') === '')
         }
         catch (error) {
             console.log(error)
         }
     }
 
-    const useremailInputTextField = (useremailError) => {
-        if (useremailError) {
+    const useremailInputTextField = (useremailError, useremailEmpty, useremailInvalid) => {
+        const useremailErrorText = "Email address is not registered or wrong password."
+        const useremailEmptyText = "Email address should not be empty."
+        const useremailInvalidText = "Invlid email address."
+
+        if (useremailError || useremailEmpty || useremailInvalid) {
             return (
                 <TextField
                     margin="normal"
@@ -89,7 +112,13 @@ export default function SignIn(props) {
                     autoComplete="useremail"
                     autoFocus
                     error
-                    helperText="Incorrect email."
+                    helperText={
+                        useremailEmpty
+                            ? useremailEmptyText
+                            : useremailInvalid
+                                ? useremailInvalidText
+                                : useremailErrorText
+                    }
                 />
             )
         }
@@ -109,8 +138,11 @@ export default function SignIn(props) {
         }
     }
 
-    const passwordInputTextField = (passwordError) => {
-        if (passwordError) {
+    const passwordInputTextField = (passwordError, userpasswordEmpty) => {
+        const passwordErrorText = "Invlid password."
+        const userpasswordEmptyText = "Password should not be empty."
+
+        if (passwordError || userpasswordEmpty) {
             return (
                 <TextField
                     margin="normal"
@@ -118,11 +150,11 @@ export default function SignIn(props) {
                     fullWidth
                     name="password"
                     label="Password"
-                    type="password"
+                    type={showpassword ? "text" : "password"}
                     id="password"
                     autoComplete="current-password"
                     error
-                    helperText="Incorrect password."
+                    helperText={userpasswordEmpty ? userpasswordEmptyText : passwordErrorText}
                 />
             )
         }
@@ -134,7 +166,7 @@ export default function SignIn(props) {
                     fullWidth
                     name="password"
                     label="Password"
-                    type="password"
+                    type={showpassword ? "text" : "password"}
                     id="password"
                     autoComplete="current-password"
                 />
@@ -167,10 +199,10 @@ export default function SignIn(props) {
                         </Typography>
                         <Box component="form" onSubmit={SignInAction} noValidate sx={{ mt: 1 }}>
                             {
-                                useremailInputTextField(useremailError)
+                                useremailInputTextField(useremailError, useremailEmpty, useremailInvalid)
                             }
                             {
-                                passwordInputTextField(passwordError)
+                                passwordInputTextField(passwordError, userpasswordEmpty)
                             }
                             <FormControlLabel
                                 control={<Checkbox value="remember" color="primary" />}
@@ -182,7 +214,7 @@ export default function SignIn(props) {
                                 variant="contained"
                                 sx={{ mt: 3, mb: 2 }}
                             >
-                                Sign In
+                                Sign In for P-Web
                             </Button>
                             <Grid container>
                                 <Grid item xs>

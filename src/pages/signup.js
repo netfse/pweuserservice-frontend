@@ -12,7 +12,6 @@ import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -87,7 +86,7 @@ export default function SignUp(props) {
                     const result = await RegisterHandler(data);
                     SetSignedUp(result)
                     SetUseremailError(!result)
-                    SetUseremailInvalid(result)
+                    SetUseremailInvalid(false)
                 }
                 else {
                     SetConfirmPasswordError(true)
@@ -104,7 +103,7 @@ export default function SignUp(props) {
     }
 
     const useremailInputTextField = (useremailError, useremailEmpty, useremailInvalid) => {
-        const useremailErrorText = "This email address is registered."
+        const useremailErrorText = "Email address is already registered."
         const useremailEmptyText = "Email address should not be empty."
         const useremailInvalidText = "Invlid email address."
 
