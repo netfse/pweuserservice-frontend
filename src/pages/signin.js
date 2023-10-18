@@ -58,7 +58,7 @@ export default function SignIn(props) {
             navigate('/signIn');
         }
     })
-    
+
     const navigate = useNavigate();
 
     const SignInAction = async (event) => {
@@ -204,10 +204,20 @@ export default function SignIn(props) {
                             {
                                 passwordInputTextField(passwordError, userpasswordEmpty)
                             }
-                            <FormControlLabel
-                                control={<Checkbox value="remember" color="primary" />}
-                                label="Remember me"
-                            />
+                            <Grid container>
+                                <Grid item xs>
+                                    <FormControlLabel
+                                        control={<Checkbox value="remember" color="primary" />}
+                                        label="Remember me"
+                                    />
+                                </Grid>
+                                <Grid item>
+                                    <FormControlLabel
+                                        control={<Checkbox value="showpassword" color="primary" onClick={(event) => SetShowPassword(event.target.checked)} />}
+                                        label="Show password"
+                                    />
+                                </Grid>
+                            </Grid>
                             <Button
                                 type="submit"
                                 fullWidth

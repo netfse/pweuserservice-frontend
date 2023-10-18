@@ -250,12 +250,14 @@ export default function SignUp(props) {
                             {
                                 confirmpasswordInputTextField(confirmpasswordError, userconfirmpasswordEmpty)
                             }
-
-                            <FormControlLabel
-                                control={<Checkbox value="showpassword" color="primary" onClick={(event) => SetShowPassword(event.target.checked)} />}
-                                label="Show password"
-                            />
-
+                            <Grid container>
+                                <Grid item xs>
+                                    <FormControlLabel
+                                        control={<Checkbox value="showpassword" color="primary" onClick={(event) => SetShowPassword(event.target.checked)} />}
+                                        label="Show password"
+                                    />
+                                </Grid>
+                            </Grid>
                             <Button
                                 type="submit"
                                 fullWidth
