@@ -42,6 +42,7 @@ export default function SignUp(props) {
     const [useremailError, SetUseremailError] = useState(false);
     const [useremailInvalid, SetUseremailInvalid] = useState(false);
     const [passwordError, SetPasswordError] = useState(false);
+    const [passwordInvalid, SetPasswordInvalid] = useState(false);
     const [confirmpasswordError, SetConfirmPasswordError] = useState(false);
     const [signedUp, SetSignedUp] = useState(false);
 
@@ -72,6 +73,14 @@ export default function SignUp(props) {
                 );
         };
 
+        const validatePassword = (password) => {
+            return String(password)
+                .toLowerCase()
+                .match(
+                    /^(?=.*[A-Za-z])(?=.*\d{6,}).{6,}$/
+                );
+        }
+
         event.preventDefault();
 
         try {
@@ -82,11 +91,15 @@ export default function SignUp(props) {
                 if (!validateEmail(data.get('useremail'))) {
                     SetUseremailInvalid(true)
                 }
+                else if (!validatePassword(data.get('password'))) {
+                    SetPasswordInvalid(true)
+                }
                 else if (data.get('password') === data.get('confirmpassword')) {
                     const result = await RegisterHandler(data);
                     SetSignedUp(result)
                     SetUseremailError(!result)
                     SetUseremailInvalid(false)
+                    SetPasswordInvalid(false)
                 }
                 else {
                     SetConfirmPasswordError(true)
@@ -145,11 +158,12 @@ export default function SignUp(props) {
         }
     }
 
-    const passwordInputTextField = (passwordError, userpasswordEmpty) => {
+    const passwordInputTextField = (passwordError, userpasswordEmpty, passwordInvalid) => {
         const passwordErrorText = "Invlid password."
         const userpasswordEmptyText = "Password should not be empty."
+        const passwordInvalidText = "Password should include at least 1 character and 6 digits"
 
-        if (passwordError || userpasswordEmpty) {
+        if (passwordError || userpasswordEmpty || passwordInvalid) {
             return (
                 <TextField
                     margin="normal"
@@ -161,7 +175,7 @@ export default function SignUp(props) {
                     id="password"
                     autoComplete="current-password"
                     error
-                    helperText={userpasswordEmpty ? userpasswordEmptyText : passwordErrorText}
+                    helperText={userpasswordEmpty ? userpasswordEmptyText : passwordInvalid ? passwordInvalidText : passwordErrorText}
                 />
             )
         }
@@ -245,7 +259,7 @@ export default function SignUp(props) {
                                 useremailInputTextField(useremailError, useremailEmpty, useremailInvalid)
                             }
                             {
-                                passwordInputTextField(passwordError, userpasswordEmpty)
+                                passwordInputTextField(passwordError, userpasswordEmpty, passwordInvalid)
                             }
                             {
                                 confirmpasswordInputTextField(confirmpasswordError, userconfirmpasswordEmpty)
