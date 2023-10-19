@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-
-import { RegisterHandler } from '../datasource/signup';
+import { LoginHandler } from '../datasource/signin';
 
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -38,23 +35,16 @@ function Copyright(props) {
     );
 }
 
-export default function SignUp(props) {
+export default function SignIn(props) {
     const [useremailError, SetUseremailError] = useState(false);
     const [useremailInvalid, SetUseremailInvalid] = useState(false);
-    const [passwordError, SetPasswordError] = useState(false);
-    const [confirmpasswordError, SetConfirmPasswordError] = useState(false);
-    const [signedUp, SetSignedUp] = useState(false);
+    const [signedIn, SetSignedIn] = useState(false);
 
     // Check Empty
     const [useremailEmpty, SetUseremailEmpty] = useState(false);
-    const [userpasswordEmpty, SetUserPasswordEmpty] = useState(false);
-    const [userconfirmpasswordEmpty, SetUserConfirmPasswordEmpty] = useState(false);
-
-    // Others
-    const [showpassword, SetShowPassword] = useState(false);
 
     useEffect(() => {
-        if (signedUp) {
+        if (signedIn) {
             navigate(-1);
             navigate('/signIn');
         }
@@ -62,7 +52,7 @@ export default function SignUp(props) {
 
     const navigate = useNavigate();
 
-    const SignUpAction = async (event) => {
+    const SignInAction = async (event) => {
 
         const validateEmail = (email) => {
             return String(email)
@@ -75,27 +65,20 @@ export default function SignUp(props) {
         event.preventDefault();
 
         try {
-
             const data = new FormData(event.currentTarget);
 
-            if (data.get('useremail') && data.get('password') && data.get('confirmpassword')) {
+            if (data.get('useremail') && data.get('password')) {
                 if (!validateEmail(data.get('useremail'))) {
                     SetUseremailInvalid(true)
                 }
-                else if (data.get('password') === data.get('confirmpassword')) {
-                    const result = await RegisterHandler(data);
-                    SetSignedUp(result)
+                else {
+                    const result = await LoginHandler(data);
+                    //SetSignedIn(result)
                     SetUseremailError(!result)
                     SetUseremailInvalid(false)
                 }
-                else {
-                    SetConfirmPasswordError(true)
-                }
             }
-
             SetUseremailEmpty(data.get('useremail') === '')
-            SetUserPasswordEmpty(data.get('password') === '')
-            SetUserConfirmPasswordEmpty(data.get('confirmpassword') === '')
         }
         catch (error) {
             console.log(error)
@@ -103,7 +86,7 @@ export default function SignUp(props) {
     }
 
     const useremailInputTextField = (useremailError, useremailEmpty, useremailInvalid) => {
-        const useremailErrorText = "Email address is already registered."
+        const useremailErrorText = "Email address is not registered or wrong password."
         const useremailEmptyText = "Email address should not be empty."
         const useremailInvalidText = "Invlid email address."
 
@@ -114,7 +97,7 @@ export default function SignUp(props) {
                     required
                     fullWidth
                     id="useremail"
-                    label="Your Email"
+                    label="Email"
                     name="useremail"
                     autoComplete="useremail"
                     autoFocus
@@ -136,82 +119,10 @@ export default function SignUp(props) {
                     required
                     fullWidth
                     id="useremail"
-                    label="Your Email Address"
+                    label="Email"
                     name="useremail"
                     autoComplete="useremail"
                     autoFocus
-                />
-            )
-        }
-    }
-
-    const passwordInputTextField = (passwordError, userpasswordEmpty) => {
-        const passwordErrorText = "Invlid password."
-        const userpasswordEmptyText = "Password should not be empty."
-
-        if (passwordError || userpasswordEmpty) {
-            return (
-                <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    name="password"
-                    label="Create Password"
-                    type={showpassword ? "text" : "password"}
-                    id="password"
-                    autoComplete="current-password"
-                    error
-                    helperText={userpasswordEmpty ? userpasswordEmptyText : passwordErrorText}
-                />
-            )
-        }
-        else {
-            return (
-                <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    name="password"
-                    label="Create Password"
-                    type={showpassword ? "text" : "password"}
-                    id="password"
-                    autoComplete="current-password"
-                />
-            )
-        }
-    }
-
-    const confirmpasswordInputTextField = (confirmpasswordError, userconfirmpasswordEmpty) => {
-        const confirmpasswordErrorText = "Confirm password is not same as password."
-        const userconfirmpasswordEmptyText = "Confirm password should not be empty."
-
-        if (confirmpasswordError || userconfirmpasswordEmpty) {
-            return (
-                <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    name="confirmpassword"
-                    label="Confirm Password"
-                    type={showpassword ? "text" : "password"}
-                    id="confirmpassword"
-                    autoComplete="current-confirmpassword"
-                    error
-                    helperText={userconfirmpasswordEmpty ? userconfirmpasswordEmptyText : confirmpasswordErrorText}
-                />
-            )
-        }
-        else {
-            return (
-                <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    name="confirmpassword"
-                    label="Confirm Password"
-                    type={showpassword ? "text" : "password"}
-                    id="confirmpassword"
-                    autoComplete="current-confirmpassword"
                 />
             )
         }
@@ -238,43 +149,29 @@ export default function SignUp(props) {
                         />
 
                         <Typography component="h1" variant="h4">
-                            Sign up
+                            Forgot password
                         </Typography>
-                        <Box component="form" onSubmit={SignUpAction} noValidate sx={{ mt: 1 }}>
+                        <Box component="form" onSubmit={SignInAction} noValidate sx={{ mt: 1 }}>
                             {
                                 useremailInputTextField(useremailError, useremailEmpty, useremailInvalid)
                             }
-                            {
-                                passwordInputTextField(passwordError, userpasswordEmpty)
-                            }
-                            {
-                                confirmpasswordInputTextField(confirmpasswordError, userconfirmpasswordEmpty)
-                            }
-                            <Grid container>
-                                <Grid item xs>
-                                    <FormControlLabel
-                                        control={<Checkbox value="showpassword" color="primary" onClick={(event) => SetShowPassword(event.target.checked)} />}
-                                        label="Show password"
-                                    />
-                                </Grid>
-                            </Grid>
                             <Button
                                 type="submit"
                                 fullWidth
                                 variant="contained"
                                 sx={{ mt: 3, mb: 2 }}
                             >
-                                Sign Up for P-Web
+                                Reset your password
                             </Button>
                             <Grid container>
                                 <Grid item xs>
-                                    <Link href="/forgotpassword" variant="body2">
-                                        Forgot password?
+                                    <Link href="/signin" variant="body2">
+                                        {"Back to Sign In"}
                                     </Link>
                                 </Grid>
                                 <Grid item>
-                                    <Link href="/signin" variant="body2">
-                                        {"Already have an account? Sign In"}
+                                    <Link href="/signup" variant="body2">
+                                        {"Don't have an account? Sign Up"}
                                     </Link>
                                 </Grid>
                             </Grid>
@@ -284,5 +181,6 @@ export default function SignUp(props) {
                 </Container>
             </ThemeProvider>
         </div>
+
     );
 }
